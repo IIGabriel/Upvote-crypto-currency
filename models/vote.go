@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fmt"
+	"gorm.io/gorm"
+)
+
 type Vote struct {
 	Id         uint     `json:"id" bson:"id" gorm:"primary_key"`
 	Type       string   `json:"type" bson:"type" gorm:"type:varchar(4)"`
@@ -7,7 +12,21 @@ type Vote struct {
 	Currency   Currency `json:"currency" bson:"currency" gorm:"type:foreignKey:CurrencyId"`
 }
 
-type VoteInterface interface {
-	CreateUpVote(Name int) error
-	CreateDownVote(Name int) error
+func (c *Currency) CreateUpVote(db *gorm.DB) error {
+	vote := Vote{Type: "UP", CurrencyId: c.Id}
+
+	if err := db.Table("votes").Create(&vote).Error; err != nil {
+		fmt.Println("erro")
+		return err
+	}
+	return nil
+}
+func (c *Currency) CreateDownVote(db *gorm.DB) error {
+	vote := Vote{Type: "DOWN", CurrencyId: c.Id}
+
+	if err := db.Table("votes").Create(&vote).Error; err != nil {
+		fmt.Println("erro")
+		return err
+	}
+	return nil
 }
