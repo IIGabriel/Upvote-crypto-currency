@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -33,7 +32,7 @@ func CloseConnection(connection *gorm.DB) {
 	}
 }
 
-func Migrations(connection *gorm.DB) {
-	connection.AutoMigrate(models.Currency{})
-	connection.AutoMigrate(models.Vote{})
-}
+//func Migrations(connection *gorm.DB) {
+//	connection.AutoMigrate(models.Currency{})
+//	connection.AutoMigrate(models.Vote{})
+//}

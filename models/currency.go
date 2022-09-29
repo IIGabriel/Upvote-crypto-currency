@@ -11,6 +11,12 @@ type Currency struct {
 	Name   string      `json:"name" bson:"name" gorm:"type:varchar(100)"`
 	Symbol string      `json:"symbol" bson:"symbol" gorm:"type:varchar(8)"`
 	Prices [][]float64 `json:"prices" bson:"prices"`
+	Votes  Votes       `json:"votes" bson:"votes"`
+}
+
+type Votes struct {
+	Up   int `json:"up" bson:"up"`
+	Down int `json:"down"bson:"down""`
 }
 
 func (c *Currency) Create(db *gorm.DB) error {
@@ -21,8 +27,8 @@ func (c *Currency) Create(db *gorm.DB) error {
 	return nil
 }
 
-func (c *Currency) FindBy(db *gorm.DB) error {
-	if err := db.Table("currencies").Where("id = 2").Find(&c).Error; err != nil {
+func (c *Currency) FindByName(db *gorm.DB) error {
+	if err := db.Table("currencies").Where("name = ?", c.Name).Find(&c).Error; err != nil {
 		fmt.Println(err)
 		return err
 	}
