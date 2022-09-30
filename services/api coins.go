@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"gorm.io/gorm"
@@ -10,28 +11,36 @@ import (
 	"time"
 )
 
-func GetPrice(coin *models.Currency) {
+func GetPrice(coin *models.Currency) error {
 
 	url := fmt.Sprintf("https://coingecko.p.rapidapi.com/coins/%s/market_chart/range?from=%d&vs_currency=BRL&to=%d",
 		coin.CoinId, time.Now().AddDate(-1, 0, 0).Unix(), time.Now().Unix())
 
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
 
-	req.Header.Add("X-RapidAPI-Key", "")
+	req.Header.Add("X-RapidAPI-Key", "ee2a9221b5msh3c607db06792088p1ef1b4jsnb991cd368659")
 	req.Header.Add("X-RapidAPI-Host", "coingecko.p.rapidapi.com")
 
 	res, _ := http.DefaultClient.Do(req)
 
 	if res.StatusCode != 200 {
 		fmt.Println("Erro")
+		return errors.New("Error while getting currency price")
 	}
 
 	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-	if err := json.Unmarshal(body, coin); err != nil {
-		fmt.Println("Erro")
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
 	}
-
+	if err = json.Unmarshal(body, coin); err != nil {
+		fmt.Println("Erro")
+		return err
+	}
+	return nil
 }
 
 func GetAllCoins(db *gorm.DB) {
@@ -40,7 +49,7 @@ func GetAllCoins(db *gorm.DB) {
 
 	req, _ := http.NewRequest("GET", url, nil)
 
-	req.Header.Add("X-RapidAPI-Key", "")
+	req.Header.Add("X-RapidAPI-Key", "ee2a9221b5msh3c607db06792088p1ef1b4jsnb991cd368659")
 	req.Header.Add("X-RapidAPI-Host", "coingecko.p.rapidapi.com")
 
 	res, _ := http.DefaultClient.Do(req)
