@@ -36,10 +36,12 @@ func GetPrice(coin *models.Currency) error {
 	if err != nil {
 		return err
 	}
-	if err = json.Unmarshal(body, coin); err != nil {
+	var prices [][]float64
+	if err = json.Unmarshal(body, &prices); err != nil {
 		fmt.Println("Erro")
 		return err
 	}
+
 	return nil
 }
 

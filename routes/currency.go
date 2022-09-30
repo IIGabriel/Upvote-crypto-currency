@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"fmt"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
@@ -11,7 +12,7 @@ import (
 func GetCurrency(c *fiber.Ctx) error {
 	coin, err := ValidCurrency(c)
 	if err != nil {
-		return err
+		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
 
 	if err = services.GetPrice(&coin); err != nil {
@@ -34,18 +35,18 @@ func ValidCurrency(c *fiber.Ctx) (models.Currency, error) {
 	coin.Name = c.Params("coin")
 
 	if coin.Name == "" {
-		return coin, c.Status(fiber.StatusBadRequest).JSON("Invalid params")
+		return coin, errors.New("Invalid params")
 	}
 
 	db := config.OpenConnection()
 	defer config.CloseConnection(db)
 
 	if err := coin.FindByName(db); err != nil {
-		return coin, c.Status(fiber.StatusInternalServerError).JSON("Error")
+		return coin, err
 	}
 
 	if coin.Id == 0 {
-		return coin, c.Status(fiber.StatusBadRequest).JSON("Invalid params")
+		return coin, errors.New("Invalid params")
 	}
 	return coin, nil
 }
