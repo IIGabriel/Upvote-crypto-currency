@@ -31,8 +31,3 @@ func CloseConnection(connection *gorm.DB) {
 		log.Fatalln(err)
 	}
 }
-
-//func Migrations(connection *gorm.DB) {
-//	connection.AutoMigrate(models.Currency{})
-//	connection.AutoMigrate(models.Vote{})
-//}

@@ -6,8 +6,9 @@ import (
 )
 
 type Vote struct {
-	Type       string `json:"type" bson:"type" gorm:"type:varchar(4)"`
-	CurrencyId uint   `json:"currency_id" bson:"currency_id"`
+	Type       string   `json:"type" bson:"type" gorm:"type:varchar(4)"`
+	CurrencyId uint     `json:"currency_id" bson:"currency_id"`
+	Currency   Currency `gorm:"foreignKey:CurrencyId"`
 }
 
 func (c *Currency) CreateUpVote(db *gorm.DB) error {

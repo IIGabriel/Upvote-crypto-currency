@@ -41,7 +41,7 @@ func ValidCurrency(c *fiber.Ctx) (models.Currency, error) {
 	db := config.OpenConnection()
 	defer config.CloseConnection(db)
 
-	if err := coin.FindByName(db); err != nil {
+	if err := coin.FindBy(db); err != nil {
 		return coin, err
 	}
 
