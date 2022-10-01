@@ -2,9 +2,10 @@ package services
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"io/ioutil"
 	"net/http"
@@ -13,22 +14,24 @@ import (
 
 func GetPrice(coin *models.Currency) error {
 
-	url := fmt.Sprintf("https://coingecko.p.rapidapi.com/coins/%s/market_chart/range?from=%d&vs_currency=BRL&to=%d",
-		coin.CoinId, time.Now().AddDate(-1, 0, 0).Unix(), time.Now().Unix())
+	url := fmt.Sprintf("https://coingecko.p.rapidapi.com/coins/%s/market_chart/range?from=%d&vs_currency=%s&to=%d",
+		coin.CoinId, time.Now().AddDate(-1, 0, 0).Unix(), config.GetEnv("main_currency"), time.Now().Unix())
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("X-RapidAPI-Key", "ee2a9221b5msh3c607db06792088p1ef1b4jsnb991cd368659")
+	req.Header.Add("X-RapidAPI-Key", config.GetEnv("coingecko_token"))
 	req.Header.Add("X-RapidAPI-Host", "coingecko.p.rapidapi.com")
 
-	res, _ := http.DefaultClient.Do(req)
-
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
 	if res.StatusCode != 200 {
-		fmt.Println("Erro")
-		return errors.New("Error while getting currency price")
+		zap.L().Info("Error Currency - GetPrice(): HTTP status != 200")
+		return nil
 	}
 
 	defer res.Body.Close()
@@ -41,7 +44,6 @@ func GetPrice(coin *models.Currency) error {
 	}{}
 
 	if err = json.Unmarshal(body, &ReceivePrice); err != nil {
-		fmt.Println("Erro")
 		return err
 	}
 	var CoinPrice models.Price
@@ -60,33 +62,33 @@ func GetAllCoins(db *gorm.DB) error {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("Erro")
+		zap.L().Info("Error GetAllCoins():", zap.Error(err))
 		return err
 	}
 
-	req.Header.Add("X-RapidAPI-Key", "ee2a9221b5msh3c607db06792088p1ef1b4jsnb991cd368659")
+	req.Header.Add("X-RapidAPI-Key", config.GetEnv("coingecko_token"))
 	req.Header.Add("X-RapidAPI-Host", "coingecko.p.rapidapi.com")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Println("Erro")
+		zap.L().Info("Error GetAllCoins():", zap.Error(err))
 		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		fmt.Println("Erro")
-		return errors.New("Erro")
+		zap.L().Info("Error GetAllCoins(): HTTP status != 200")
+		return nil
 	}
 	body, _ := ioutil.ReadAll(res.Body)
 	if err = json.Unmarshal(body, &allCoins); err != nil {
-		fmt.Println("Erro")
+		zap.L().Info("Error GetAllCoins():", zap.Error(err))
 		return err
 	}
 
 	for _, item := range allCoins {
 		if err = item.CreateIfNotExist(db); err != nil {
-			fmt.Println("Erro")
+			zap.L().Info("Error creating currencies in db GetAllCoins():", zap.Error(err))
 			return err
 		}
 	}

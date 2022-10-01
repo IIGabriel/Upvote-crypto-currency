@@ -2,11 +2,11 @@ package routes
 
 import (
 	"errors"
-	"fmt"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/services"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 func GetCurrency(c *fiber.Ctx) error {
@@ -16,8 +16,7 @@ func GetCurrency(c *fiber.Ctx) error {
 	}
 
 	if err = services.GetPrice(&coin); err != nil {
-		fmt.Println("Erro")
-		//	TODO COLOCAR UMA LOG DESCENTE
+		zap.L().Info("Error Currency - GetPrice():", zap.Error(err))
 	}
 	db := config.OpenConnection()
 	defer config.CloseConnection(db)

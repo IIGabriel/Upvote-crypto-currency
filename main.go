@@ -5,6 +5,7 @@ import (
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/routes"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/services"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -12,10 +13,10 @@ func main() {
 
 	db := config.OpenConnection()
 	if err := db.AutoMigrate(models.Currency{}, models.Vote{}); err != nil {
-		panic(err)
+		zap.L().Panic("Could not do migrations", zap.Error(err))
 	}
 	if err := services.GetAllCoins(db); err != nil {
-		panic(err)
+		zap.L().Panic("Could not get currency values", zap.Error(err))
 	}
 	config.CloseConnection(db)
 
@@ -23,8 +24,8 @@ func main() {
 
 	app := routes.AllRoutes()
 
-	if err := app.Listen(":7777"); err != nil {
-		panic(err)
+	if err := app.Listen(config.GetEnv("listen_port")); err != nil {
+		zap.L().Panic("Error listening port", zap.Error(err))
 	}
 
 }
