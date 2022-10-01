@@ -1,6 +1,9 @@
 package models
 
 import (
+	"errors"
+	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"strings"
@@ -8,11 +11,11 @@ import (
 
 type Currency struct {
 	Id     uint    `gorm:"primary_key" json:"-" bson:"-"`
-	CoinId string  `json:"coin" bson:"coin" gorm:"type:varchar(100)"`
+	CoinId string  `json:"id" bson:"id" gorm:"type:varchar(100)"`
 	Name   string  `json:"name" bson:"name" gorm:"type:varchar(100)"`
 	Symbol string  `json:"symbol" bson:"symbol" gorm:"type:varchar(100)"`
-	Prices []Price `json:"prices" bson:"prices" gorm:"-"`
 	Votes  Votes   `json:"votes" bson:"votes" gorm:"-"`
+	Prices []Price `json:"prices" bson:"prices" gorm:"-"`
 }
 
 type Price struct {
@@ -47,4 +50,36 @@ func (c *Currency) FindBy(db *gorm.DB) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Currency) Delete(db *gorm.DB) error {
+	c.Name = strings.ToUpper(c.Name)
+
+	if err := db.Table("currencies").Delete(&c).Error; err != nil {
+		zap.L().Info("Error Currency - Delete():", zap.Error(err))
+		return err
+	}
+
+	return nil
+}
+
+func ValidCurrency(c *fiber.Ctx) (Currency, error) {
+	var coin Currency
+	coin.Name = c.Params("coin")
+
+	if coin.Name == "" {
+		return coin, errors.New("Invalid params")
+	}
+
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+
+	if err := coin.FindBy(db); err != nil {
+		return coin, err
+	}
+
+	if coin.Id == 0 {
+		return coin, errors.New("Invalid params")
+	}
+	return coin, nil
 }

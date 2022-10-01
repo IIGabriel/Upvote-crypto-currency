@@ -8,7 +8,11 @@ func AllRoutes() *fiber.App {
 	// Votes
 	app.Post("/upvote/:coin", CreateUpVote)
 	app.Post("/downvote/:coin", CreateDownVote)
+
+	// Currency
 	app.Get("/currency/:coin", GetCurrency)
+	app.Post("/currency", CreateCurrency)
+	app.Delete("/currency/:coin", DeleteCurrency)
 
 	return app
 }

@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"errors"
+	"encoding/json"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/services"
@@ -10,7 +10,7 @@ import (
 )
 
 func GetCurrency(c *fiber.Ctx) error {
-	coin, err := ValidCurrency(c)
+	coin, err := models.ValidCurrency(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
@@ -29,23 +29,46 @@ func GetCurrency(c *fiber.Ctx) error {
 
 }
 
-func ValidCurrency(c *fiber.Ctx) (models.Currency, error) {
+func CreateCurrency(c *fiber.Ctx) error {
 	var coin models.Currency
-	coin.Name = c.Params("coin")
 
-	if coin.Name == "" {
-		return coin, errors.New("Invalid params")
+	if err := json.Unmarshal(c.Body(), &coin); err != nil {
+		zap.L().Info("Error JSON Unmarshal - CreateCurrency():", zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON("Internal Error")
+	}
+
+	if coin.CoinId == "" || coin.Name == "" || coin.Symbol == "" {
+		return c.Status(fiber.StatusBadRequest).JSON("Inform all fields")
 	}
 
 	db := config.OpenConnection()
 	defer config.CloseConnection(db)
 
-	if err := coin.FindBy(db); err != nil {
-		return coin, err
+	if err := coin.CreateIfNotExist(db); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON("Internal Error")
 	}
 
 	if coin.Id == 0 {
-		return coin, errors.New("Invalid params")
+		return c.Status(fiber.StatusBadRequest).JSON("Currency already exist")
 	}
-	return coin, nil
+
+	return c.Status(fiber.StatusCreated).JSON("Currency added")
+
+}
+
+func DeleteCurrency(c *fiber.Ctx) error {
+	coin, err := models.ValidCurrency(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("Invalid Params")
+	}
+
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+
+	if err = coin.Delete(db); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON("Internal error")
+	}
+
+	return c.Status(fiber.StatusOK).JSON("Currency Deleted")
+
 }

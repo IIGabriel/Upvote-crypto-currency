@@ -30,7 +30,7 @@ func GetPrice(coin *models.Currency) error {
 		return err
 	}
 	if res.StatusCode != 200 {
-		zap.L().Info("Error Currency - GetPrice(): HTTP status != 200")
+		zap.L().Warn("Error Currency - GetPrice(): HTTP status != 200")
 		return nil
 	}
 
@@ -39,6 +39,7 @@ func GetPrice(coin *models.Currency) error {
 	if err != nil {
 		return err
 	}
+
 	ReceivePrice := struct {
 		Prices [][]float64 `json:"prices"`
 	}{}
@@ -46,6 +47,7 @@ func GetPrice(coin *models.Currency) error {
 	if err = json.Unmarshal(body, &ReceivePrice); err != nil {
 		return err
 	}
+
 	var CoinPrice models.Price
 	for _, item := range ReceivePrice.Prices {
 		CoinPrice.Price = item[1]

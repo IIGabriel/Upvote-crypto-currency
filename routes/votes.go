@@ -2,11 +2,12 @@ package routes
 
 import (
 	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
+	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"github.com/gofiber/fiber/v2"
 )
 
 func CreateUpVote(c *fiber.Ctx) error {
-	coin, err := ValidCurrency(c)
+	coin, err := models.ValidCurrency(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
@@ -22,7 +23,7 @@ func CreateUpVote(c *fiber.Ctx) error {
 }
 
 func CreateDownVote(c *fiber.Ctx) error {
-	coin, err := ValidCurrency(c)
+	coin, err := models.ValidCurrency(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
