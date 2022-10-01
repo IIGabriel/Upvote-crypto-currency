@@ -24,7 +24,7 @@ func main() {
 
 	app := routes.AllRoutes()
 
-	if err := app.Listen(config.GetEnv("listen_port")); err != nil {
+	if err := app.Listen(":" + config.GetEnv("listen_port")); err != nil {
 		zap.L().Panic("Error listening port", zap.Error(err))
 	}
 
