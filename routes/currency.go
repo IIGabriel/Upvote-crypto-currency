@@ -78,7 +78,7 @@ func DeleteCurrency(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON("Internal error")
 	}
 
-	return c.Status(fiber.StatusOK).JSON("Currency Deleted")
+	return c.Status(fiber.StatusOK).JSON("Currency deleted")
 
 }
 
@@ -102,5 +102,5 @@ func EditCurrency(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON("Could not update")
 	}
 
-	return c.Status(fiber.StatusOK).JSON("Currency Updated")
+	return c.Status(fiber.StatusOK).JSON("Currency updated")
 }
