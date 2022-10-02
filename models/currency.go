@@ -63,6 +63,17 @@ func (c *Currency) Delete(db *gorm.DB) error {
 	return nil
 }
 
+func (c *Currency) Update(db *gorm.DB) error {
+	c.Name = strings.ToUpper(c.Name)
+
+	if err := db.Table("currencies").Updates(&c).Error; err != nil {
+		zap.L().Warn("Error Currency - Update():", zap.Error(err))
+		return err
+	}
+
+	return nil
+}
+
 func ValidCurrency(c *fiber.Ctx) (Currency, error) {
 	var coin Currency
 	coin.Name = c.Params("coin")

@@ -72,3 +72,23 @@ func DeleteCurrency(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON("Currency Deleted")
 
 }
+
+func EditCurrency(c *fiber.Ctx) error {
+	coin, err := models.ValidCurrency(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON("Invalid Params")
+	}
+	if err = json.Unmarshal(c.Body(), &coin); err != nil {
+		zap.L().Info("Error JSON Unmarshal - CreateCurrency():", zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON("Internal Error")
+	}
+
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+
+	if err = coin.Update(db); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON("Could not update")
+	}
+
+	return c.Status(fiber.StatusOK).JSON("Currency Updated")
+}

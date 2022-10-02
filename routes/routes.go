@@ -10,8 +10,9 @@ func AllRoutes() *fiber.App {
 	app.Post("/downvote/:coin", CreateDownVote)
 
 	// Currency
-	app.Get("/currency/:coin", GetCurrency)
 	app.Post("/currency", CreateCurrency)
+	app.Get("/currency/:coin", GetCurrency)
+	app.Put("/currency/:coin", EditCurrency)
 	app.Delete("/currency/:coin", DeleteCurrency)
 
 	return app

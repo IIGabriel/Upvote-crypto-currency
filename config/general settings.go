@@ -40,7 +40,7 @@ func getLogWriter() zapcore.WriteSyncer {
 	return zapcore.AddSync(file)
 }
 
-func getEncoder() zapcore.Encoder {
+func getLogFormat() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 		enc.AppendString(t.Local().Format("2006-01-02 15:04:05"))
@@ -50,7 +50,7 @@ func getEncoder() zapcore.Encoder {
 
 func InitLogger() {
 	createDirectoryIfNotExist()
-	core := zapcore.NewCore(getEncoder(), getLogWriter(), zapcore.DebugLevel)
+	core := zapcore.NewCore(getLogFormat(), getLogWriter(), zapcore.DebugLevel)
 	logg := zap.New(core, zap.AddCaller())
 
 	zap.ReplaceGlobals(logg)
