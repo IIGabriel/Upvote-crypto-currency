@@ -5,16 +5,31 @@ import (
 	"fmt"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
 	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
-func GetPrice(coin *models.Currency) error {
+func GetPrice(coin *models.Currency, c *fiber.Ctx) error {
+
+	// Getting url params
+	mainCurrency := c.Query("compare_currency")
+	if len(mainCurrency) == 0 {
+		mainCurrency = config.GetEnv("main_currency")
+	}
+	finalDate, _ := time.Parse("2006-01-02", c.Query("final_date"))
+	if finalDate.IsZero() {
+		finalDate = time.Now()
+	}
+	initialDate, _ := time.Parse("2006-01-02", c.Query("initial_date"))
+	if initialDate.IsZero() {
+		initialDate = finalDate.AddDate(-1, 0, 0)
+	}
 
 	url := fmt.Sprintf("https://coingecko.p.rapidapi.com/coins/%s/market_chart/range?from=%d&vs_currency=%s&to=%d",
-		coin.CoinId, time.Now().AddDate(-1, 0, 0).Unix(), config.GetEnv("main_currency"), time.Now().Unix())
+		coin.CoinId, initialDate.Unix(), mainCurrency, finalDate.Unix())
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -50,7 +65,7 @@ func GetPrice(coin *models.Currency) error {
 	var CoinPrice models.Price
 	for _, item := range ReceivePrice.Prices {
 		CoinPrice.Price = item[1]
-		CoinPrice.Date = time.Unix(int64(item[0]/1000), 0).Format("02/01/2006")
+		CoinPrice.Date = time.Unix(int64(item[0]/1000), 0).Format("2006/01/02 15:01:05")
 		coin.Prices = append(coin.Prices, CoinPrice)
 	}
 

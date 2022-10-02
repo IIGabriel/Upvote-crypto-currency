@@ -18,8 +18,10 @@ func GetCurrency(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
 
-	if err = services.GetPrice(&coin); err != nil {
-		zap.L().Info("Error Currency - GetPrice():", zap.Error(err))
+	if c.Query("omit_price") != "true" {
+		if err = services.GetPrice(&coin, c); err != nil {
+			zap.L().Info("Error Currency - GetPrice():", zap.Error(err))
+		}
 	}
 
 	if err = coin.FindVotes(db); err != nil {
@@ -31,6 +33,10 @@ func GetCurrency(c *fiber.Ctx) error {
 }
 
 func CreateCurrency(c *fiber.Ctx) error {
+	if !config.ValidatorSessionToken(c) {
+		return c.Status(fiber.StatusUnauthorized).JSON("Permission denied")
+	}
+
 	var coin models.Currency
 
 	if err := json.Unmarshal(c.Body(), &coin); err != nil {
@@ -58,6 +64,9 @@ func CreateCurrency(c *fiber.Ctx) error {
 }
 
 func DeleteCurrency(c *fiber.Ctx) error {
+	if !config.ValidatorSessionToken(c) {
+		return c.Status(fiber.StatusUnauthorized).JSON("Permission denied")
+	}
 	db := config.OpenConnection()
 	defer config.CloseConnection(db)
 	coin, err := models.ValidCurrency(c, db)
@@ -74,6 +83,9 @@ func DeleteCurrency(c *fiber.Ctx) error {
 }
 
 func EditCurrency(c *fiber.Ctx) error {
+	if !config.ValidatorSessionToken(c) {
+		return c.Status(fiber.StatusUnauthorized).JSON("Permission denied")
+	}
 	db := config.OpenConnection()
 	defer config.CloseConnection(db)
 

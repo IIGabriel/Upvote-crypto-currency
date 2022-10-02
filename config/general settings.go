@@ -2,10 +2,12 @@ package config
 
 import (
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -54,4 +56,14 @@ func InitLogger() {
 	logg := zap.New(core, zap.AddCaller())
 
 	zap.ReplaceGlobals(logg)
+}
+
+func ValidatorSessionToken(c *fiber.Ctx) bool {
+	headers := string(c.Request().Header.RawHeaders())
+	for _, item := range strings.Split(headers, "\r\n") {
+		if item == fmt.Sprintf("Permission_token: %s", GetEnv("coingecko_token")) {
+			return true
+		}
+	}
+	return false
 }
