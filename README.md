@@ -131,3 +131,9 @@ Value: <Token de acesso resgatado em coingecko >
 
 ## API externa utilizada
 https://rapidapi.com/coingecko/api/coingecko
+
+## Testes
+- Para rodar os testes utilize o seguinte comando na raiz do seu projeto
+```
+go test ./tests
+```
