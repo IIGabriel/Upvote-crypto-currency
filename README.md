@@ -4,11 +4,11 @@
 - Projeto proposto com o intuito de contabilizar "Upvotes" e "Downvotes" à cripto moedas.
 
 ## Importando a aplicação
-Clone o repositório em sua máquina local utilizando.
+Clone o repositório em sua máquina local utilizando:
 ```
 git clone https://github.com/IIGabriel/Upvote-crypto-currency.git
 ```
-Para baixar as dependencia do projeto execute na raiz do seu projeto.
+Para baixar as dependencias do projeto execute no terminal:
 ```
 go mod tidy
 ```
@@ -29,7 +29,7 @@ Esse arquivo contém os campos personalizados da aplicação onde deve ser defin
 
 ## Como utilizar
 
-- Rota utilizada para criar um Upvoto (POST)
+- Rota utilizada para criar um Upvote (POST)
 ```
 /upvote/:currency_name
 ```
@@ -42,10 +42,6 @@ Esse arquivo contém os campos personalizados da aplicação onde deve ser defin
 Exemplo:
 ```
 localhost:7777/upvote/klever
-```
-Retorno: 
-```
-Downvote registered
 ```
 
 ### Rota que retorna as informações da moeda (GET)
@@ -60,7 +56,7 @@ initial_date=YYYY-MM-DD
 final_date=YYYY-MM-DD
 ```
 São utilizados para definir o range de dias dos preços da moeda.
-Por **Padrão**, caso o 'initial_date' não tenha sido declarado é selecionado o range de 1 ano antes da data inicial.
+Por **Padrão**, caso o 'initial_date' não tenha sido declarado é selecionado o range de 1 ano antes da data final.
 
 - Caso não deseje as informações dos precos da moeda e busque uma requisição mais rápida utilize:
 ```
