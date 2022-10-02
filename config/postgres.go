@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/IIGabriel/Upvote-crypto-currency.git/models"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -25,5 +26,13 @@ func CloseConnection(connection *gorm.DB) {
 
 	if err = db.Close(); err != nil {
 		zap.L().Panic("Could not close connection to database", zap.Error(err))
+	}
+}
+
+func Migrations() {
+	db := OpenConnection()
+	defer CloseConnection(db)
+	if err := db.AutoMigrate(models.Currency{}, models.Vote{}); err != nil {
+		zap.L().Panic("Could not do migrations", zap.Error(err))
 	}
 }

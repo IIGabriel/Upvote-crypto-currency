@@ -38,3 +38,12 @@ func (c *Currency) FindVotes(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func (c *Currency) DeleteVotes(db *gorm.DB) error {
+	vote := Vote{Type: "", CurrencyId: c.Id}
+	if err := db.Table("votes").Where("currency_id = ?", c.Id).Delete(&vote).Error; err != nil {
+		zap.L().Warn("Error Votes - DeleteVotes():", zap.Error(err))
+		return err
+	}
+	return nil
+}

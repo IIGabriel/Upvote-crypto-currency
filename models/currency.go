@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"github.com/IIGabriel/Upvote-crypto-currency.git/config"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -55,6 +54,10 @@ func (c *Currency) FindBy(db *gorm.DB) error {
 func (c *Currency) Delete(db *gorm.DB) error {
 	c.Name = strings.ToUpper(c.Name)
 
+	if err := c.DeleteVotes(db); err != nil {
+		return err
+	}
+
 	if err := db.Table("currencies").Delete(&c).Error; err != nil {
 		zap.L().Warn("Error Currency - Delete():", zap.Error(err))
 		return err
@@ -74,16 +77,13 @@ func (c *Currency) Update(db *gorm.DB) error {
 	return nil
 }
 
-func ValidCurrency(c *fiber.Ctx) (Currency, error) {
+func ValidCurrency(c *fiber.Ctx, db *gorm.DB) (Currency, error) {
 	var coin Currency
 	coin.Name = c.Params("coin")
 
 	if coin.Name == "" {
 		return coin, errors.New("Invalid params")
 	}
-
-	db := config.OpenConnection()
-	defer config.CloseConnection(db)
 
 	if err := coin.FindBy(db); err != nil {
 		return coin, err

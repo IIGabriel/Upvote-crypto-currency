@@ -7,13 +7,12 @@ import (
 )
 
 func CreateUpVote(c *fiber.Ctx) error {
-	coin, err := models.ValidCurrency(c)
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+	coin, err := models.ValidCurrency(c, db)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
-
-	db := config.OpenConnection()
-	defer config.CloseConnection(db)
 
 	if err = coin.CreateUpVote(db); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON("Internal error")
@@ -23,13 +22,13 @@ func CreateUpVote(c *fiber.Ctx) error {
 }
 
 func CreateDownVote(c *fiber.Ctx) error {
-	coin, err := models.ValidCurrency(c)
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+
+	coin, err := models.ValidCurrency(c, db)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
-
-	db := config.OpenConnection()
-	defer config.CloseConnection(db)
 
 	if err = coin.CreateDownVote(db); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON("Internal error")

@@ -10,7 +10,10 @@ import (
 )
 
 func GetCurrency(c *fiber.Ctx) error {
-	coin, err := models.ValidCurrency(c)
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+
+	coin, err := models.ValidCurrency(c, db)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid params")
 	}
@@ -18,8 +21,6 @@ func GetCurrency(c *fiber.Ctx) error {
 	if err = services.GetPrice(&coin); err != nil {
 		zap.L().Info("Error Currency - GetPrice():", zap.Error(err))
 	}
-	db := config.OpenConnection()
-	defer config.CloseConnection(db)
 
 	if err = coin.FindVotes(db); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON("Error")
@@ -57,13 +58,12 @@ func CreateCurrency(c *fiber.Ctx) error {
 }
 
 func DeleteCurrency(c *fiber.Ctx) error {
-	coin, err := models.ValidCurrency(c)
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+	coin, err := models.ValidCurrency(c, db)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid Params")
 	}
-
-	db := config.OpenConnection()
-	defer config.CloseConnection(db)
 
 	if err = coin.Delete(db); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON("Internal error")
@@ -74,7 +74,10 @@ func DeleteCurrency(c *fiber.Ctx) error {
 }
 
 func EditCurrency(c *fiber.Ctx) error {
-	coin, err := models.ValidCurrency(c)
+	db := config.OpenConnection()
+	defer config.CloseConnection(db)
+
+	coin, err := models.ValidCurrency(c, db)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON("Invalid Params")
 	}
@@ -82,9 +85,6 @@ func EditCurrency(c *fiber.Ctx) error {
 		zap.L().Info("Error JSON Unmarshal - CreateCurrency():", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON("Internal Error")
 	}
-
-	db := config.OpenConnection()
-	defer config.CloseConnection(db)
 
 	if err = coin.Update(db); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON("Could not update")
