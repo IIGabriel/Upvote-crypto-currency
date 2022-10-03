@@ -64,7 +64,7 @@ func GetAllCoins(db *gorm.DB) error {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		zap.L().Info("Error GetAllCoins():", zap.Error(err))
+		zap.L().Warn("Error GetAllCoins():", zap.Error(err))
 		return err
 	}
 
@@ -73,13 +73,13 @@ func GetAllCoins(db *gorm.DB) error {
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		zap.L().Info("Error GetAllCoins():", zap.Error(err))
+		zap.L().Warn("Error GetAllCoins():", zap.Error(err))
 		return err
 	}
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		zap.L().Info("Error GetAllCoins(): HTTP status != 200")
+		zap.L().Warn("Error GetAllCoins(): HTTP status != 200")
 		return nil
 	}
 	body, _ := ioutil.ReadAll(res.Body)
@@ -90,7 +90,7 @@ func GetAllCoins(db *gorm.DB) error {
 
 	for _, item := range allCoins {
 		if err = item.CreateIfNotExist(db); err != nil {
-			zap.L().Info("Error creating currencies in db GetAllCoins():", zap.Error(err))
+			zap.L().Warn("Error creating currencies in db GetAllCoins():", zap.Error(err))
 			return err
 		}
 	}

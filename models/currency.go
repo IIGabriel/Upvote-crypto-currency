@@ -37,7 +37,7 @@ func (c *Currency) CreateIfNotExist(db *gorm.DB) error {
 	}
 
 	if err := db.Table("currencies").Create(&c).Where(c).Error; err != nil {
-		zap.L().Info("Error Currency - Create():", zap.Error(err))
+		zap.L().Warn("Error Currency - Create():", zap.Error(err))
 		return err
 	}
 	return nil
@@ -46,7 +46,7 @@ func (c *Currency) CreateIfNotExist(db *gorm.DB) error {
 func (c *Currency) FindBy(db *gorm.DB) error {
 	c.Name = strings.ToUpper(c.Name)
 	if err := db.Table("currencies").Where(c).Find(&c).Error; err != nil {
-		zap.L().Info("Error Currency - FindBy():", zap.Error(err))
+		zap.L().Warn("Error Currency - FindBy():", zap.Error(err))
 		return err
 	}
 	return nil
@@ -56,7 +56,7 @@ func (c *Currency) Delete(db *gorm.DB) error {
 	c.Name = strings.ToUpper(c.Name)
 
 	if err := db.Table("currencies").Delete(&c).Error; err != nil {
-		zap.L().Info("Error Currency - Delete():", zap.Error(err))
+		zap.L().Warn("Error Currency - Delete():", zap.Error(err))
 		return err
 	}
 

@@ -1,11 +1,9 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
 
 func OpenConnection() *gorm.DB {
@@ -28,12 +26,4 @@ func CloseConnection(connection *gorm.DB) {
 	if err = db.Close(); err != nil {
 		zap.L().Panic("Could not close connection to database", zap.Error(err))
 	}
-}
-
-func GetEnv(key string) string {
-	err := godotenv.Load(".env")
-	if err != nil {
-		zap.L().Info("Error GetEnv():", zap.Error(err))
-	}
-	return os.Getenv(key)
 }

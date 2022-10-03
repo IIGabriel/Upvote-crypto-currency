@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	config.InitLogger()
+
 	///////////////// Migrations /////////////////
 
 	db := config.OpenConnection()
