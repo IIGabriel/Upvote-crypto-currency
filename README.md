@@ -10,7 +10,7 @@ git clone https://github.com/IIGabriel/Upvote-crypto-currency.git
 ```
 Para baixar as dependencias do projeto execute no terminal:
 ```
-go mod tidy
+go get
 ```
 
 ## Configurações do projeto
