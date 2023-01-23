@@ -1,4 +1,4 @@
-# Klever currency upvote
+# Currency upvote
 
 ## Bem-vindo(a)!
 - Projeto proposto com o intuito de contabilizar "Upvotes" e "Downvotes" à cripto moedas.
